@@ -21,7 +21,7 @@ public class User implements Serializable {
     @Column(name = "email")
     private String email;
     @Column(name = "contraseña")
-    private String contraseña;
+    private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "equipo_usuario",

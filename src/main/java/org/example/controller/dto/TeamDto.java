@@ -1,45 +1,50 @@
 package org.example.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.entity.Athlete;
+import org.example.entity.Team;
 import org.example.entity.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class TeamDto {
     @NotNull
     private Integer id;
     @NotBlank
     private String name;
     @NotBlank
-    private String email;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private Timestamp creationDate;
     @NotBlank
-    private String password;
+    private String country;
 
-    public static User toEntity(UserDto dto) {
-        return new User(
+    public static Team toEntity(TeamDto dto) {
+        return new Team(
                 dto.getId(),
                 dto.getName(),
-                dto.getEmail(),
-                dto.getPassword(),
+                dto.getCreationDate(),
+                dto.getCountry(),
                 new ArrayList<>(),
+                new Athlete(),
                 new ArrayList<>(),
                 new ArrayList<>()
         );
     }
-
-    public static UserDto toDto(User entity) {
-        return new UserDto(
+    public static TeamDto toDto(Team entity) {
+        return new TeamDto(
                 entity.getId(),
                 entity.getName(),
-                entity.getEmail(),
-                entity.getPassword()
+                entity.getCreationDate(),
+                entity.getCountry()
         );
     }
 }
