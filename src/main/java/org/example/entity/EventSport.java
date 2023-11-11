@@ -22,4 +22,6 @@ public class EventSport implements Serializable {
     private String resultado;
     @Column(name = "ubicacion")
     private String ubicacion;
+
+
 }

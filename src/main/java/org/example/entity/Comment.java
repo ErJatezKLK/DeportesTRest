@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,16 +18,16 @@ public class Comment implements Serializable {
     @Id
     private Integer id;
     @Column(name = "contenido")
-    private String contenido;
+    private String content;
     @Column(name = "fecha")
-    private Timestamp fecha;
+    private Timestamp date;
     @Column(name = "hora")
-    private String hora;
+    private Date hour;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comments")
+    @JoinColumn(name = "comments", insertable=false, updatable=false)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comments")
+    @JoinColumn(name = "comments", insertable=false, updatable=false)
     private Sport sport;
 
 }
