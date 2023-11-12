@@ -16,11 +16,15 @@ import java.util.List;
 @Table(name = "deporte")
 public class Sport implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "nombre")
     private String name;
+
     @OneToMany(mappedBy = "sport")
     private List<Comment> comments;
+
     @OneToOne(mappedBy = "sport")
     private Athlete athlete;
 }

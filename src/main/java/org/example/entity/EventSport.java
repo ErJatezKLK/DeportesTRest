@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,12 +18,18 @@ import java.util.List;
 public class EventSport implements Serializable {
     @Id
     private Integer id;
-    @ManyToMany(mappedBy = "events")
-    private List<Team> teams;
     @Column(name = "resultado")
     private String resultado;
     @Column(name = "ubicacion")
     private String ubicacion;
+    @Column(name = "fecha")
+    private Timestamp date;
+    @Column(name = "hora")
+    private Timestamp hour;
+    @ManyToMany(mappedBy = "events")
+    private List<Team> teams;
+
+
 
 
 }

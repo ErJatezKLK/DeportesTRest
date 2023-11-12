@@ -13,7 +13,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
@@ -27,8 +26,8 @@ public class CommentDto {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Timestamp date;
     @NotNull
-    @JsonFormat
-    private Date hour;
+    @JsonFormat(pattern = "ss/mm/hh")
+    private Timestamp hour;
     @NotEmpty
     private User user;
     @NotEmpty
