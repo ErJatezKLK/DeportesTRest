@@ -11,6 +11,8 @@ public class DeportesService {
     @Autowired
     private UserDAO userDAO;
 
+
+
     public User getUserByEmailAndPassword(
             String email, String password
     ) {
@@ -23,5 +25,9 @@ public class DeportesService {
         User user;
         user = userDAO.getUserByEmail(email);
         return user;
+    }
+
+    public boolean addUser(User entity) {
+        return userDAO.addUser(entity);
     }
 }
