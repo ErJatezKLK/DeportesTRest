@@ -28,8 +28,6 @@ public class EventDto {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Timestamp date;
     @NotNull
-    @JsonFormat(pattern = "ss/mm/hh")
-    private Timestamp hour;
     @NotEmpty
     private List<Team> teams;
 
@@ -40,7 +38,6 @@ public class EventDto {
                 dto.getResultado(),
                 dto.getUbicacion(),
                 dto.getDate(),
-                dto.getHour(),
                 dto.getTeams()
 
         );
@@ -52,7 +49,6 @@ public class EventDto {
                 entity.getResultado(),
                 entity.getUbicacion(),
                 entity.getDate(),
-                entity.getHour(),
                 entity.getTeams()
         );
     }

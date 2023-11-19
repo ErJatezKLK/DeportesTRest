@@ -19,9 +19,17 @@ public class UserController {
     public ResponseEntity<UserDto> user(
             @RequestParam(value = "email") String email,
             @RequestParam(value = "password") String password
-
     ) {
         User user = deportesService.getUserByEmailAndPassword(email, password);
+        UserDto userDto = UserDto.toDto(user);
+        return ResponseEntity.ok(userDto);
+    }
+
+    @GetMapping(path = "/userE")
+    public ResponseEntity<UserDto> userEmail(
+            @RequestParam(value = "email") String email
+    ) {
+        User user = deportesService.getUserByEmail(email);
         UserDto userDto = UserDto.toDto(user);
         return ResponseEntity.ok(userDto);
     }

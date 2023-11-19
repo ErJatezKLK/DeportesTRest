@@ -26,9 +26,6 @@ public class Comment implements Serializable {
     @Column(name = "fecha")
     private Timestamp date;
 
-    @Column(name = "hora")
-    private Timestamp hour;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

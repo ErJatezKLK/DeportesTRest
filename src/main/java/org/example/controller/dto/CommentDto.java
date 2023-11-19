@@ -25,9 +25,6 @@ public class CommentDto {
     @NotNull
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Timestamp date;
-    @NotNull
-    @JsonFormat(pattern = "ss/mm/hh")
-    private Timestamp hour;
     @NotEmpty
     private User user;
     @NotEmpty
@@ -38,7 +35,6 @@ public class CommentDto {
                 dto.getId(),
                 dto.getContent(),
                 dto.getDate(),
-                dto.getHour(),
                 new User(),
                 new Sport()
         );
@@ -49,7 +45,6 @@ public class CommentDto {
                 entity.getId(),
                 entity.getContent(),
                 entity.getDate(),
-                entity.getHour(),
                 entity.getUser(),
                 entity.getSport()
         );

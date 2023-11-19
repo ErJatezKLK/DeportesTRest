@@ -14,7 +14,14 @@ public class DeportesService {
     public User getUserByEmailAndPassword(
             String email, String password
     ) {
-        return userDAO.getUserByEmailAndPassword(email, password);
+        User user;
+        user = userDAO.getUserByEmailAndPassword(email, password);
+        return user;
     }
 
+    public User getUserByEmail(String email) {
+        User user;
+        user = userDAO.getUserByEmail(email);
+        return user;
+    }
 }

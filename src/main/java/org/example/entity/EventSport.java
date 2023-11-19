@@ -24,8 +24,6 @@ public class EventSport implements Serializable {
     private String ubicacion;
     @Column(name = "fecha")
     private Timestamp date;
-    @Column(name = "hora")
-    private Timestamp hour;
     @ManyToMany(mappedBy = "events")
     private List<Team> teams;
 
