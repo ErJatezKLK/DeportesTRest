@@ -17,6 +17,7 @@ import java.util.List;
 @Table(name = "partido")
 public class EventSport implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "resultado")
     private String resultado;

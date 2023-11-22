@@ -15,6 +15,7 @@ import java.util.List;
 @Table(name = "deportista")
 public class Athlete implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "nombre")
     private String name;
@@ -31,9 +32,9 @@ public class Athlete implements Serializable {
     @Column(name = "titulos")
     private Integer titles;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "deportista")
+    @JoinColumn(name = "athletes")
     private Team team;
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "athlete")
     private Sport sport;
 

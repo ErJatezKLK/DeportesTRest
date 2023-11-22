@@ -14,13 +14,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SportDto {
-    @NotNull
+    @Positive
     private Integer id;
     @NotBlank
     private String name;
@@ -30,7 +31,7 @@ public class SportDto {
                 dto.getId(),
                 dto.getName(),
                 new ArrayList<>(),
-                new Athlete()
+                new ArrayList<>()
         );
     }
 

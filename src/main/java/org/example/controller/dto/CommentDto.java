@@ -11,6 +11,7 @@ import org.example.entity.User;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -18,7 +19,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDto {
-    @NotNull
+    @Positive
     private Integer id;
     @NotBlank
     private String content;

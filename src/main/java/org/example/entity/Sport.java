@@ -25,6 +25,6 @@ public class Sport implements Serializable {
     @OneToMany(mappedBy = "sport")
     private List<Comment> comments;
 
-    @OneToOne(mappedBy = "sport")
-    private Athlete athlete;
+    @OneToMany(mappedBy = "sport")
+    private List<Athlete> athlete;
 }
