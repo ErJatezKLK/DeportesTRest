@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.entity.Athlete;
+import org.example.entity.Sport;
 import org.example.entity.Team;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +35,7 @@ public class TeamDto {
                 dto.getCreationDate(),
                 dto.getCountry(),
                 new ArrayList<>(),
-                new Athlete(),
+                new Sport(),
                 new ArrayList<>(),
                 new ArrayList<>()
         );
@@ -46,4 +48,12 @@ public class TeamDto {
                 entity.getCountry()
         );
     }
+
+    public static TeamDto fromTeamAndAthletes(String name, List<Athlete> athletes) {
+        // Aquí puedes realizar lógica adicional según tus necesidades
+        // Por ahora, simplemente retornamos un nuevo objeto TeamDto
+        return new TeamDto(null, name, null, null);
+    }
+
+
 }

@@ -25,6 +25,10 @@ public class EventSport implements Serializable {
     private String ubicacion;
     @Column(name = "fecha")
     private Timestamp date;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "deporte")
+    private Sport sport;
+
     @ManyToMany(mappedBy = "events")
     private List<Team> teams;
 

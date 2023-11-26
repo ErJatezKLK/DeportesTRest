@@ -24,7 +24,7 @@ public class AthleteDto {
     private Integer id;
     @NotBlank
     private String name;
-    @NotBlank
+
     private String surname;
     @NotBlank
     private String position;
@@ -32,9 +32,9 @@ public class AthleteDto {
     private Integer age;
     @NotBlank
     private String nacionality;
-    @NotBlank
+
     private String nickName;
-    @NotBlank
+
     private Integer titles;
     @NotEmpty
     private Team team;

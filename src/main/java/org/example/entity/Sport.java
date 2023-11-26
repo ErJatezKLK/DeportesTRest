@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,5 +27,14 @@ public class Sport implements Serializable {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "sport")
+    @JsonIgnore
     private List<Athlete> athlete;
+
+    @OneToMany(mappedBy = "sport")
+    @JsonIgnore
+    private List<Team> teams;
+
+    @OneToMany(mappedBy = "sport")
+    @JsonIgnore
+    private List<EventSport> eventSports;
 }

@@ -27,10 +27,10 @@ public class Comment implements Serializable {
     private Timestamp date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "usuario")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sport_id")
+    @JoinColumn(name = "deporte")
     private Sport sport;
 }

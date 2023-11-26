@@ -31,6 +31,8 @@ public class SportDto {
                 dto.getId(),
                 dto.getName(),
                 new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 new ArrayList<>()
         );
     }

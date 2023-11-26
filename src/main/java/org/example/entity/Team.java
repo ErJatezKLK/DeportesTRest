@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,11 @@ public class Team implements Serializable {
     private Timestamp creationDate;
     @Column(name = "pais")
     private String country;
-    @JoinColumn(name = "deporte")
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Sport> sport;
+    @OneToMany(mappedBy = "team")
+    private List<Athlete> athletes;
     @ManyToOne(fetch = FetchType.LAZY)
-    private Athlete athletes;
-
+    @JoinColumn(name = "deporte")
+    private Sport sport;
     @ManyToMany(mappedBy = "teams")
     private List<User> user;
     @ManyToMany(fetch = FetchType.LAZY)
@@ -38,4 +38,5 @@ public class Team implements Serializable {
             joinColumns = {@JoinColumn(name = "equipo")},
             inverseJoinColumns = {@JoinColumn(name = "partido")})
     private List<EventSport> events;
+
 }
