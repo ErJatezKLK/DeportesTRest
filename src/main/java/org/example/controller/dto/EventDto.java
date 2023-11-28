@@ -1,6 +1,9 @@
 package org.example.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,27 +23,24 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class EventDto {
     @Positive
     private Integer id;
-    @NotBlank
-    private String resultado;
-
-    private String ubicacion;
-    @NotNull
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonProperty("result")
+    private String result;
+    @JsonProperty("location")
+    private String location;
     private Timestamp date;
-    @NotBlank
     private Sport sport;
-    @NotEmpty
     private List<Team> teams;
 
 
     public static EventSport toEntity(EventDto dto) {
         return new EventSport(
                 dto.getId(),
-                dto.getResultado(),
-                dto.getUbicacion(),
+                dto.getResult(),
+                dto.getLocation(),
                 dto.getDate(),
                 dto.getSport(),
                 dto.getTeams()
@@ -50,8 +50,8 @@ public class EventDto {
     public static EventDto toDto(EventSport entity) {
         return new EventDto(
                 entity.getId(),
-                entity.getResultado(),
-                entity.getUbicacion(),
+                entity.getResult(),
+                entity.getLocation(),
                 entity.getDate(),
                 entity.getSport(),
                 entity.getTeams()

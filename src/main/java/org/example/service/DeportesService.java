@@ -66,6 +66,9 @@ public class DeportesService {
 
     public List<TeamDto> getTemasByIdSport(Integer sportId) {
         List<Team> teams = teamDao.findTeamBySportId(sportId);
+        teams.forEach(team -> {
+            team.getAthletes().isEmpty();
+        });
         List<TeamDto> teamDtos = new ArrayList<>();
 
         for (Team team : teams) {
@@ -78,6 +81,9 @@ public class DeportesService {
 
     public List<EventDto> getEventsBySportId(Integer sportId) {
         List<EventSport> eventSports = eventDAO.findEventBySportId(sportId);
+        eventSports.forEach(eventSport -> {
+            eventSport.getSport().getName().isEmpty();
+        });
         List<EventDto> eventDtos = new ArrayList<>();
 
         for (EventSport event : eventSports) {

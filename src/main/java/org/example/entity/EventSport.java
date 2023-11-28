@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,19 +21,16 @@ public class EventSport implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "resultado")
-    private String resultado;
+    private String result;
     @Column(name = "ubicacion")
-    private String ubicacion;
+    private String location;
     @Column(name = "fecha")
     private Timestamp date;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "deporte")
     private Sport sport;
 
     @ManyToMany(mappedBy = "events")
     private List<Team> teams;
-
-
-
 
 }

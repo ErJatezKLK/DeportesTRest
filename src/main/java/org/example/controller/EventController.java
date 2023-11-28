@@ -14,11 +14,11 @@ public class EventController {
     @Autowired
     private DeportesService deportesService;
 
-    @GetMapping(path = "/event")
+    @GetMapping(path = "/events")
     public ResponseEntity<List<EventDto>> getEventsBySportId(
             @RequestParam(value = "sportId") Integer sportId
     ){
-        List<EventDto> eventDtos = deportesService. getEventsBySportId(sportId);
+        List<EventDto> eventDtos = deportesService.getEventsBySportId(sportId);
         return ResponseEntity.ok().body(eventDtos);
     }
 }

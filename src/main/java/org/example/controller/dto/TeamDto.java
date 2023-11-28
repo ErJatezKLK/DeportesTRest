@@ -1,6 +1,7 @@
 package org.example.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,15 +18,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class TeamDto {
     @Positive
     private Integer id;
-    @NotBlank
     private String name;
-    @NotBlank
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Timestamp creationDate;
-    @NotBlank
     private String country;
 
     public static Team toEntity(TeamDto dto) {
@@ -48,12 +46,4 @@ public class TeamDto {
                 entity.getCountry()
         );
     }
-
-    public static TeamDto fromTeamAndAthletes(String name, List<Athlete> athletes) {
-        // Aquí puedes realizar lógica adicional según tus necesidades
-        // Por ahora, simplemente retornamos un nuevo objeto TeamDto
-        return new TeamDto(null, name, null, null);
-    }
-
-
 }
