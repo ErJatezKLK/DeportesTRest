@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.controller.dto.EventDto;
 import org.example.controller.dto.TeamDto;
+import org.example.controller.dto.UserDto;
 import org.example.dao.*;
 import org.example.entity.EventSport;
 import org.example.entity.Sport;
@@ -90,7 +91,11 @@ public class DeportesService {
             EventDto eventDto = EventDto.toDto(event);
             eventDtos.add(eventDto);
         }
-
         return eventDtos;
     }
+
+    public UserDto findByEmail(String email) {
+        return UserDto.toDto(userDAO.getUserByEmail(email));
+    }
+
 }

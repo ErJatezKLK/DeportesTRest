@@ -54,4 +54,16 @@ public class UserController {
         deportesService.deleteUserByEmail(email);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/userM")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody User userDto
+
+    ) {
+        if (deportesService.addUser(userDto)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
 }
