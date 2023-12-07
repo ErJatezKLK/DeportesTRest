@@ -4,20 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entity.Athlete;
-import org.example.entity.Comment;
-import org.example.entity.Sport;
-import org.example.entity.User;
+import org.example.entity.SportEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.ArrayList;
-import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,8 +20,8 @@ public class SportDto {
     @NotBlank
     private String name;
 
-    public static Sport toEntity(Sport dto) {
-        return new Sport(
+    public static SportEntity toEntity(SportEntity dto) {
+        return new SportEntity(
                 dto.getId(),
                 dto.getName(),
                 new ArrayList<>(),
@@ -39,7 +31,7 @@ public class SportDto {
         );
     }
 
-    public static SportDto toDto(Sport entity) {
+    public static SportDto toDto(SportEntity entity) {
         return new SportDto(
                 entity.getId(),
                 entity.getName()

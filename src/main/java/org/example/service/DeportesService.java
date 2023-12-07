@@ -1,13 +1,10 @@
 package org.example.service;
 
+import org.example.controller.dto.AthleteDto;
 import org.example.controller.dto.EventDto;
 import org.example.controller.dto.TeamDto;
-import org.example.controller.dto.UserDto;
 import org.example.dao.*;
-import org.example.entity.EventSport;
-import org.example.entity.Sport;
-import org.example.entity.Team;
-import org.example.entity.User;
+import org.example.entity.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,21 +29,39 @@ public class DeportesService {
     @Autowired
     private AthleteDAO athleteDAO;
 
-    public User getUserByEmailAndPassword(
+    /**
+     * Metodo que llama al dao para pedir un usuario
+     * por email y contraseña
+     * @param email
+     * @param password
+     * @return
+     */
+    public UserEntity getUserByEmailAndPassword(
             String email, String password
     ) {
-        User user;
+        UserEntity user;
         user = userDAO.getUserByEmailAndPassword(email, password);
         return user;
     }
 
-    public User getUserByEmail(String email) {
-        User user;
+    /**
+     * Metodo que llama al dao para pedir un usuario
+     * por email
+     * @param email
+     * @return
+     */
+    public UserEntity getUserByEmail(String email) {
+        UserEntity user;
         user = userDAO.getUserByEmail(email);
         return user;
     }
 
-    public boolean addUser(User user) {
+    /**
+     * Llama al dao para crear un usuario
+     * @param user
+     * @return
+     */
+    public boolean addUser(UserEntity user) {
         if (!userDAO.existsByEmail(user.getEmail().toLowerCase())) {
             user.setEmail(user.getEmail().toLowerCase());
             user.setEmail(user.getEmail().toLowerCase());
@@ -57,45 +72,318 @@ public class DeportesService {
         }
     }
 
-    public List<Sport> getAllSports() {
+    /**
+     * Llama al dao para pedir todos los deportes
+     * @return
+     */
+    public List<SportEntity> getAllSports() {
         return sportDAO.findAll();
     }
 
+    /**
+     * Llama al dao para borrar un usuario por email
+     * @param email
+     */
     public void deleteUserByEmail(String email) {
         userDAO.deleteByEmail(email);
     }
 
-    public List<TeamDto> getTemasByIdSport(Integer sportId) {
-        List<Team> teams = teamDao.findTeamBySportId(sportId);
+    /**
+     * Busca todos los equipos por id de deporte
+     * @param sportId
+     * @return
+     */
+    public List<TeamDto> getTeamsByIdSport(Integer sportId) {
+        List<TeamEntity> teams = teamDao.findTeamBySportId(sportId);
         teams.forEach(team -> {
             team.getAthletes().isEmpty();
         });
         List<TeamDto> teamDtos = new ArrayList<>();
 
-        for (Team team : teams) {
+        for (TeamEntity team : teams) {
             TeamDto teamDto = TeamDto.toDto(team);
             teamDtos.add(teamDto);
         }
-
         return teamDtos;
     }
 
+    /**
+     * Busca todos los eventos por id de deporte
+     * @param sportId
+     * @return
+     */
     public List<EventDto> getEventsBySportId(Integer sportId) {
-        List<EventSport> eventSports = eventDAO.findEventBySportId(sportId);
+        List<EventSportEntity> eventSports = eventDAO.findEventBySportId(sportId);
         eventSports.forEach(eventSport -> {
             eventSport.getSport().getName().isEmpty();
         });
         List<EventDto> eventDtos = new ArrayList<>();
 
-        for (EventSport event : eventSports) {
+        for (EventSportEntity event : eventSports) {
             EventDto eventDto = EventDto.toDto(event);
             eventDtos.add(eventDto);
         }
         return eventDtos;
     }
 
-    public UserDto findByEmail(String email) {
-        return UserDto.toDto(userDAO.getUserByEmail(email));
+    /**
+     * Cambia la contraseña de usuario
+     *
+     * @param user
+     * @param newPassword
+     * @return
+     */
+    public boolean addUserWithNewPassword(UserEntity user, String newPassword) {
+        if (!user.getPassword().isEmpty()) {
+            user.setPassword(newPassword);
+            userDAO.save(user);
+            return true;
+        } else {
+            return false;
+        }
     }
+
+    public List<AthleteDto> getTenisPlayersByIdSport(Integer sportId) {
+        List<AthleteEntity> athleteEntities = athleteDAO.findBySport_Id(sportId);
+        athleteEntities.forEach(athleteEntity -> {
+            athleteEntity.getName().isEmpty();
+        });
+
+        List<AthleteDto> athleteDtos = new ArrayList<>();
+
+        for (AthleteEntity athleteEntity: athleteEntities) {
+            AthleteDto athleteDto = AthleteDto.toDto(athleteEntity);
+            athleteDtos.add(athleteDto);
+        }
+        return athleteDtos;
+
+    }
+
+    /*
+    //TODO Descubrir como arreglar el siguiente error
+    El caso es que parece un bucle el cual busca el equipo y los deportistas una y otra vez
+    llega un punto en el que aborta para no implosionar
+
+    Este error solo sale en caso de poner lo siguiente en el dto
+    private List<AthleteDto> athleteDtoList;
+
+    Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+    [Request processing failed; nested exception is org.springframework.http.converter.
+    HttpMessageNotWritableException: Could not write JSON: Infinite recursion (StackOverflowError);
+    nested exception is com.fasterxml.jackson.databind.JsonMappingException: Infinite recursion
+    (StackOverflowError) (through reference chain: org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]-
+    >org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]-
+    >org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->
+    org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->
+    org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"]->
+    org.hibernate.collection.internal.PersistentBag[0]->org.example.entity.AthleteEntity["team"]->org.example.entity.TeamEntity["athletes"])] with root cause
+
+    public TeamDto getTeamWithMembers(Integer teamId) {
+        TeamEntity team = teamDao.getTeamWithMembersById(teamId);
+        team.getAthletes().forEach(athleteEntity -> {
+            athleteEntity.getName().isEmpty();
+        });
+        return TeamDto.toDto(team);
+    }
+     */
+
+
 
 }

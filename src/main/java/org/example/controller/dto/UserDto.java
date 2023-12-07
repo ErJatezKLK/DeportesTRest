@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entity.User;
+import org.example.entity.UserEntity;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 
@@ -25,8 +24,8 @@ public class UserDto {
     @NotBlank
     private String password;
 
-    public static User toEntity(UserDto dto) {
-        return new User(
+    public static UserEntity toEntity(UserDto dto) {
+        return new UserEntity(
                 dto.getId(),
                 dto.getName(),
                 dto.getEmail(),
@@ -37,7 +36,7 @@ public class UserDto {
         );
     }
 
-    public static UserDto toDto(User entity) {
+    public static UserDto toDto(UserEntity entity) {
         return new UserDto(
                 entity.getId(),
                 entity.getName(),

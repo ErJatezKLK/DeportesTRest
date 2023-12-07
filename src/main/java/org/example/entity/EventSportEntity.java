@@ -1,6 +1,5 @@
 package org.example.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "partido")
-public class EventSport implements Serializable {
+public class EventSportEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,9 +26,9 @@ public class EventSport implements Serializable {
     private Timestamp date;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "deporte")
-    private Sport sport;
+    private SportEntity sport;
 
     @ManyToMany(mappedBy = "events")
-    private List<Team> teams;
+    private List<TeamEntity> teams;
 
 }

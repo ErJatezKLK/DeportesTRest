@@ -1,14 +1,17 @@
 package org.example.dao;
 
-import org.example.entity.Team;
-import org.example.entity.User;
+import org.example.entity.TeamEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public interface TeamDao extends JpaRepository<Team, String> {
+public interface TeamDao extends JpaRepository<TeamEntity, String> {
 
 
-    List<Team> findTeamBySportId(Integer sportId);
+    List<TeamEntity> findTeamBySportId(Integer sportId);
+
+    TeamEntity getById(Integer teamdId);
+
+    TeamEntity getTeamWithMembersById(Integer id);
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.tomcat.util.http.parser.Cookie;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "deporte")
-public class Sport implements Serializable {
+public class SportEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -24,17 +23,17 @@ public class Sport implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "sport")
-    private List<Comment> comments;
+    private List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "sport")
     @JsonIgnore
-    private List<Athlete> athlete;
+    private List<AthleteEntity> athlete;
 
     @OneToMany(mappedBy = "sport")
     @JsonIgnore
-    private List<Team> teams;
+    private List<TeamEntity> teams;
 
     @OneToMany(mappedBy = "sport")
     @JsonIgnore
-    private List<EventSport> eventSports;
+    private List<EventSportEntity> eventSports;
 }

@@ -1,6 +1,9 @@
 package org.example.controller;
 
-import org.example.controller.dto.EventDto;
+import net.bytebuddy.agent.builder.AgentBuilder;
+import org.example.controller.dto.AthleteDto;
+import org.example.controller.dto.TeamDto;
+import org.example.entity.AthleteEntity;
 import org.example.service.DeportesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,20 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class EventController {
+public class AthleteController {
+
     @Autowired
     private DeportesService deportesService;
 
-    /**
-     * Busca los eventos por id de deporte
-     * @param sportId
-     * @return
-     */
-    @GetMapping(path = "/events")
-    public ResponseEntity<List<EventDto>> getEventsBySportId(
+    @GetMapping("/athletes")
+    public ResponseEntity<List<AthleteDto>> getAthletesList(
             @RequestParam(value = "sportId") Integer sportId
     ){
-        List<EventDto> eventDtos = deportesService.getEventsBySportId(sportId);
-        return ResponseEntity.ok().body(eventDtos);
+        List<AthleteDto> athleteDtos = deportesService.getTenisPlayersByIdSport(sportId);
+        return ResponseEntity.ok().body(athleteDtos);
     }
 }

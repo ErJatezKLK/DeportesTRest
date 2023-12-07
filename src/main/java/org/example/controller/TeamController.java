@@ -16,11 +16,30 @@ public class TeamController {
     @Autowired
     private DeportesService deportesService;
 
-    @GetMapping(path = "teams")
+    /**
+     * Busca por equipo por id de deporte
+     * @param sportId
+     * @return
+     */
+    @GetMapping(path = "/teams")
     public ResponseEntity<List<TeamDto>> teams(
         @RequestParam(value = "sportId") Integer sportId
     ){
-        List<TeamDto> teams = deportesService.getTemasByIdSport(sportId);
+        List<TeamDto> teams = deportesService.getTeamsByIdSport(sportId);
         return ResponseEntity.ok().body(teams);
     }
+
+
+    /*
+    @GetMapping(path = "/team-athlete")
+    public ResponseEntity<TeamDto> teamWithAthletes(
+            @RequestParam(value = "teamId") Integer teamdId
+    ){
+        TeamDto teamDto = deportesService.getTeamWithMembers(teamdId);
+        return ResponseEntity.ok().body(teamDto);
+    }
+
+     */
+
+
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "usuario")
-public class User implements Serializable {
+public class UserEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,15 +28,15 @@ public class User implements Serializable {
     @JoinTable(name = "equipo_usuario",
             joinColumns = {@JoinColumn(name = "equipo")},
             inverseJoinColumns = {@JoinColumn(name = "usuario")})
-    private List<Team> teams;
+    private List<TeamEntity> teams;
 
     @OneToMany(mappedBy = "user")
-    private List<Comment> comments;
+    private List<CommentEntity> comments;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "usuario_deportista",
     joinColumns = {@JoinColumn(name = "usuario")},
     inverseJoinColumns = {@JoinColumn(name = "deportista")})
-    private List<Athlete> athletes;
+    private List<AthleteEntity> athletes;
 
 }

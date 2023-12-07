@@ -1,16 +1,16 @@
 package org.example.dao;
 
 
-import org.example.entity.User;
+import org.example.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserDAO extends JpaRepository<User, String> {
+public interface UserDAO extends JpaRepository<UserEntity, String> {
 
-    User getUserByEmailAndPassword(String email, String password);
+    UserEntity getUserByEmailAndPassword(String email, String password);
 
-    User getUserByEmail(String email);
+    UserEntity getUserByEmail(String email);
 
     boolean existsByEmail(String lowerCase);
 

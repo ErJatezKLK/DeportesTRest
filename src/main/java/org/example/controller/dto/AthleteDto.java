@@ -4,18 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entity.Athlete;
-import org.example.entity.Sport;
-import org.example.entity.Team;
-import org.example.entity.User;
+import org.example.entity.AthleteEntity;
+import org.example.entity.SportEntity;
+import org.example.entity.TeamEntity;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -39,12 +36,12 @@ public class AthleteDto {
 
     private Integer titles;
     @NotEmpty
-    private Team team;
+    private TeamEntity team;
     @NotEmpty
-    private Sport sport;
+    private SportEntity sport;
 
-    public static Athlete toEntity(AthleteDto dto) {
-        return new Athlete(
+    public static AthleteEntity toEntity(AthleteDto dto) {
+        return new AthleteEntity(
                 dto.getId(),
                 dto.getName(),
                 dto.getSurname(),
@@ -53,13 +50,13 @@ public class AthleteDto {
                 dto.getNacionality(),
                 dto.getNickName(),
                 dto.getTitles(),
-                new Team(),
-                new Sport(),
+                new TeamEntity(),
+                new SportEntity(),
                 new ArrayList<>()
         );
     }
 
-    public static AthleteDto toDto(AthleteDto entity) {
+    public static AthleteDto toDto(AthleteEntity entity) {
         return new AthleteDto(
                 entity.getId(),
                 entity.getName(),
@@ -69,8 +66,8 @@ public class AthleteDto {
                 entity.getNacionality(),
                 entity.getNickName(),
                 entity.getTitles(),
-                new Team(),
-                new Sport()
+                new TeamEntity(),
+                new SportEntity()
         );
     }
 }

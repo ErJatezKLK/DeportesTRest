@@ -1,23 +1,16 @@
 package org.example.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entity.EventSport;
-import org.example.entity.Sport;
-import org.example.entity.Team;
+import org.example.entity.EventSportEntity;
+import org.example.entity.SportEntity;
+import org.example.entity.TeamEntity;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -32,12 +25,12 @@ public class EventDto {
     @JsonProperty("location")
     private String location;
     private Timestamp date;
-    private Sport sport;
-    private List<Team> teams;
+    private SportEntity sport;
+    private List<TeamEntity> teams;
 
 
-    public static EventSport toEntity(EventDto dto) {
-        return new EventSport(
+    public static EventSportEntity toEntity(EventDto dto) {
+        return new EventSportEntity(
                 dto.getId(),
                 dto.getResult(),
                 dto.getLocation(),
@@ -47,7 +40,7 @@ public class EventDto {
         );
     }
 
-    public static EventDto toDto(EventSport entity) {
+    public static EventDto toDto(EventSportEntity entity) {
         return new EventDto(
                 entity.getId(),
                 entity.getResult(),
