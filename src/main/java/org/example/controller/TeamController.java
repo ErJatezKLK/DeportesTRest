@@ -30,7 +30,7 @@ public class TeamController {
     }
 
 
-    /*
+    
     @GetMapping(path = "/team-athlete")
     public ResponseEntity<TeamDto> teamWithAthletes(
             @RequestParam(value = "teamId") Integer teamdId
@@ -39,7 +39,7 @@ public class TeamController {
         return ResponseEntity.ok().body(teamDto);
     }
 
-     */
+
 
 
 }

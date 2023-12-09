@@ -1,9 +1,6 @@
 package org.example.controller;
 
-import net.bytebuddy.agent.builder.AgentBuilder;
 import org.example.controller.dto.AthleteDto;
-import org.example.controller.dto.TeamDto;
-import org.example.entity.AthleteEntity;
 import org.example.service.DeportesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +20,14 @@ public class AthleteController {
             @RequestParam(value = "sportId") Integer sportId
     ){
         List<AthleteDto> athleteDtos = deportesService.getTenisPlayersByIdSport(sportId);
+        return ResponseEntity.ok().body(athleteDtos);
+    }
+
+    @GetMapping("/atheletes-team")
+    public ResponseEntity<List<AthleteDto>> getAthleteByTeamId(
+        @RequestParam(value = "teamId") Integer teamId
+    ){
+        List<AthleteDto> athleteDtos = deportesService.getAthletesByTeamId(teamId);
         return ResponseEntity.ok().body(athleteDtos);
     }
 }

@@ -8,7 +8,9 @@ import java.util.List;
 
 @Repository
 public interface AthleteDAO extends JpaRepository<AthleteEntity, String> {
-    List<AthleteEntity> findBySport_Id(Integer sportId);
+    List<AthleteEntity> findBySportId(Integer sportId);
+
+    List<AthleteEntity> findByTeamId(Integer teamId);
 
 
 }
