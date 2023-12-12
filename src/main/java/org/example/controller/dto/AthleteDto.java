@@ -30,9 +30,9 @@ public class AthleteDto {
     @NotNull
     private Integer age;
     @NotBlank
-    private String nacionality;
+    private String nationality;
 
-    private String nickName;
+    private String nickname;
 
     private Integer titles;
     @NotEmpty
@@ -47,8 +47,8 @@ public class AthleteDto {
                 dto.getSurname(),
                 dto.getPosition(),
                 dto.getAge(),
-                dto.getNacionality(),
-                dto.getNickName(),
+                dto.getNationality(),
+                dto.getNickname(),
                 dto.getTitles(),
                 new TeamEntity(),
                 new SportEntity(),
@@ -63,8 +63,8 @@ public class AthleteDto {
                 entity.getSurname(),
                 entity.getPosition(),
                 entity.getAge(),
-                entity.getNacionality(),
-                entity.getNickName(),
+                entity.getNationality(),
+                entity.getNickname(),
                 entity.getTitles(),
                 new TeamEntity(),
                 new SportEntity()

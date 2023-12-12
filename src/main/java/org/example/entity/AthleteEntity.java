@@ -31,10 +31,10 @@ public class AthleteEntity implements Serializable {
     private Integer age;
 
     @Column(name = "nacionalidad")
-    private String nacionality;
+    private String nationality;
 
     @Column(name = "apodo")
-    private String nickName;
+    private String nickname;
 
     @Column(name = "titulos")
     private Integer titles;
